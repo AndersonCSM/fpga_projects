@@ -2,7 +2,20 @@
 
 This document outlines two development workflows for the Gowin Tang Nano boards (1K, 9K, 20K):
 1. **Gowin IDE (Windows):** Official GUI toolchain.
-2. **oss-cad-suite (Linux/Mac):** Open-source toolchain (Yosys, nextpnr, openFPGALoader).
+2. **oss-cad-suite (Cross-Platform):** Open-source toolchain (Yosys, nextpnr, openFPGALoader).
+
+---
+
+## Index
+
+- [Part 1: Gowin IDE (Windows)](#part-1-gowin-ide-windows)
+  - [1. Installation](#1-installation)
+  - [2. Create Project](#2-create-project)
+  - [3. Create Verilog File and Synthesis](#3-create-verilog-file-and-synthesis)
+  - [4. Constraints and Programming](#4-constraints-and-programming)
+- [Part 2: Open Source Toolchain (Cross-Platform)](#part-2-open-source-toolchain-cross-platform)
+  - [Option A: Workflow via VS Code & Lushay Code (Recommended)](#option-a-workflow-via-vs-code--lushay-code-recommended)
+  - [Option B: Workflow via Makefile (CLI)](#option-b-workflow-via-makefile-cli)
 
 ---
 
@@ -40,9 +53,98 @@ This document outlines two development workflows for the Gowin Tang Nano boards 
 
 ---
 
-## Part 2: Open Source Toolchain (Linux)
+## Part 2: Open Source Toolchain (Cross-Platform)
 
-**Prerequisite:** Install `oss-cad-suite` as detailed in [`suit_install.md`](suit_install.md).
+**Prerequisite:** Install `oss-cad-suite` and the Lushay Code extension as detailed in [`suit_install.md`](suit_install.md).
+
+### Option A: Workflow via VS Code & Lushay Code (Recommended)
+
+This workflow utilizes the Lushay Code extension to automate project creation, synthesis, and programming.
+
+#### 1. Create a Project Folder
+Create an empty directory for your new project and open it in Visual Studio Code.
+
+#### 2. Initialize the Project
+- Click on the Lushay Code extension icon or open the Command Palette (`Ctrl+Shift+P`) to create a new project.
+- **2.1.** Write the project name when prompted.
+
+#### 3. Default Project Files
+The extension generates a basic structure, including:
+- `top.v`: The main Verilog module (Top-Level) where you will write your hardware logic.
+- `top.cst`: The Physical Constraints file where you map the top-level Verilog ports (inputs/outputs) to the actual physical pins on the FPGA board.
+
+#### 4. Basic Constraints (`tang.cst`)
+Depending on your board version, use the following base templates for the system clock:
+
+**Tang Nano 1K:**
+```cst
+IO_LOC "clk" 52;
+IO_PORT "clk" IO_TYPE=LVCMOS33 PULL_MODE=UP;
+```
+
+**Tang Nano 9K:**
+```cst
+IO_LOC "clk" 52;
+IO_PORT "clk" IO_TYPE=LVCMOS33 PULL_MODE=UP;
+```
+
+**Tang Nano 20K:**
+```cst
+IO_LOC "clk" 4;
+IO_PORT "clk" IO_TYPE=LVCMOS33 PULL_MODE=UP;
+```
+
+#### 5. Project Configuration (JSON)
+The extension relies on a JSON configuration file (e.g., `project.lushay.json`). Depending on your board version, structure your JSON as follows (using `blink` as the project name):
+
+**Tang Nano 1K:**
+```json
+{
+    "name": "blink",
+    "project_name": "blink",
+    "top_module": "top",
+    "device": "GW1NZ-LV1QN48C6/I5",
+    "board": "tangnano1k",
+    "includedFiles": ["blink.v"],
+    "constraintFiles": ["blink.cst"]
+}
+```
+
+**Tang Nano 9K:**
+```json
+{
+    "name": "blink",
+    "project_name": "blink",
+    "top_module": "top",
+    "device": "GW1NR-LV9QN88PC6/I5",
+    "board": "tangnano9k",
+    "includedFiles": ["blink.v"],
+    "constraintFiles": ["blink.cst"]
+}
+```
+
+**Tang Nano 20K:**
+```json
+{
+    "name": "blink",
+    "project_name": "blink",
+    "top_module": "top",
+    "device": "GW2AR-LV18",
+    "board": "tangnano20k",
+    "includedFiles": ["blink.v"],
+    "constraintFiles": ["blink.cst"]
+}
+```
+
+#### 6. Toolchain Execution
+With a source file active, click on the Lushay Code toolchain menu. You will find the following options:
+- **Compile:** Runs the toolchain to synthesize the design and generate the bitstream (`.fs`).
+- **Run:** Uses openFPGALoader to program the previously generated bitstream to the board.
+- **Compile and Run:** Performs the complete pipeline sequentially: synthesis, bitstream generation, and immediate FPGA programming.
+
+---
+
+### Option B: Workflow via Makefile (CLI)
 
 ### 1. Project Structure
 

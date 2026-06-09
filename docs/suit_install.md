@@ -1,36 +1,37 @@
-# Tang Nano on Linux — Complete Guide
+# Tang Nano Toolchain — Complete Installation Guide
 
-Installation and configuration guide for the `oss-cad-suite` toolchain for FPGA development with Tang Nano on Linux.
+Installation and configuration guide for the `oss-cad-suite` toolchain for FPGA development with Tang Nano boards on Linux and Windows.
 
-**Platforms:** Tang Nano 1K, 20K and variants  
+**Platforms:** Tang Nano 1K, 9K, 20K and variants  
 **Toolchain:** `oss-cad-suite` (Yosys, nextpnr, openFPGALoader)  
-**Support:** Linux (Ubuntu 20.04+, Debian, Fedora, etc.)
+**Support:** Linux (Ubuntu 20.04+, Debian, Fedora, etc.) and Windows
 
 ---
 
 ## Index
 
-1. [Overview](#overview)
-2. [Prerequisites](#prerequisites)
-3. [Installing oss-cad-suite](#installing-oss-cad-suite)
-4. [Configuring Environment Variables](#configuring-environment-variables)
-5. [Installing OpenFPGALoader](#installing-openfpgaloader)
-6. [USB/Driver Configuration](#usbdriver-configuration)
-7. [Verifying Installation](#verifying-installation)
-8. [Basic Usage](#basic-usage)
-9. [Troubleshooting](#troubleshooting)
+- [Overview](#overview)
+- [Pre-requisites](#pre-requisites)
+- [Installing oss-cad-suite (Linux)](#installing-oss-cad-suite-linux)
+- [Configuring Environment Variables (Linux)](#configuring-environment-variables-linux)
+- [Installing OpenFPGALoader (Linux)](#installing-openfpgaloader-linux)
+- [USB/Driver Configuration (Linux)](#usbdriver-configuration-linux)
+- [Verifying Installation](#verifying-installation)
+- [Windows Installation](#windows-installation)
+- [VS Code Development Extensions](#vs-code-development-extensions)
+- [Troubleshooting Windows: JTAG and Zadig](#troubleshooting-windows-jtag-and-zadig)
 
 ---
 
 ## Overview
 
-To work with **Tang Nano** on Linux, you need:
+To work with **Tang Nano** using open-source tools, you need:
 
 | Tool | Function |
 |------------|--------|
-| **oss-cad-suite** | Synthesis, Place & Route, Bitstream (Yosys + nextpnr) |
+| **oss-cad-suite** | Synthesis, Place & Route, Bitstream Generation (Yosys + nextpnr) |
 | **openFPGALoader** | FPGA programmer via USB/JTAG |
-| **USB Drivers** | Communication with FPGA |
+| **USB Drivers** | Communication with the FPGA board |
 
 ### Recommended Layout
 
@@ -50,7 +51,7 @@ hdl/
 
 ---
 
-## Prerequisites
+## Pre-requisites
 
 - **Linux:** Ubuntu 20.04 LTS or later (recommended)
 - **Disk space:** ≥ 5 GB
@@ -95,52 +96,52 @@ sudo dnf install -y \
 
 ---
 
-## Installing oss-cad-suite
+## Installing oss-cad-suite (Linux)
 
 ### Option A: Global Installation (Recommended)
 
-Instalar em `/home/tools/` para compartilhar entre projetos.
+Install in `/home/tools/` to share between projects.
 
 ```bash
-# Criar diretório
+# Create directory
 sudo mkdir -p /home/tools
 cd /home/tools
 
-# Determinar versão (substituir VERSION pela tag mais recente)
-# Acesse: https://github.com/YosysHQ/oss-cad-suite-build/releases
+# Determine version (replace VERSION with the latest tag)
+# Check: https://github.com/YosysHQ/oss-cad-suite-build/releases
 
-# Fazer download (Linux x64)
-VERSION="2024-01-01"  # Exemplo: ajuste para a versão mais recente
+# Download (Linux x64)
+VERSION="2024-01-01"  # Example: adjust to the latest version
 wget https://github.com/YosysHQ/oss-cad-suite-build/releases/download/${VERSION}/oss-cad-suite-linux-x64-${VERSION}.tgz
 
-# Extrair
+# Extract
 sudo tar xzf oss-cad-suite-linux-x64-${VERSION}.tgz
 
-# Remover arquivo compactado
+# Remove archive
 sudo rm oss-cad-suite-linux-x64-${VERSION}.tgz
 
-# Verificar instalação
+# Verify installation
 ls -la /home/tools/oss-cad-suite/bin/
 ```
 
-### Opção B: Instalação Local (Projeto Específico)
+### Option B: Local Installation (Project Specific)
 
-Se preferir instalar apenas para um projeto:
+If you prefer to install only for a specific project:
 
 ```bash
 cd hdl/tang_nano_1k
 
-# Download e extração
+# Download and extract
 wget https://github.com/YosysHQ/oss-cad-suite-build/releases/download/VERSION/oss-cad-suite-linux-x64.tgz
 tar xzf oss-cad-suite-linux-x64.tgz
 rm oss-cad-suite-linux-x64.tgz
 
-# Usar path local em vez de global
+# Use local path instead of global
 ```
 
 ---
 
-## Configuring Environment Variables
+## Configuring Environment Variables (Linux)
 
 ### 1. Edit `~/.bashrc`
 
@@ -175,43 +176,43 @@ openFPGALoader --version
 
 ---
 
-## Installing OpenFPGALoader
+## Installing OpenFPGALoader (Linux)
 
-**openFPGALoader** is the programmer to load bitstreams into the FPGA.
+**openFPGALoader** is the programmer utility used to flash bitstreams into the FPGA.
 
-### Opção A: Via Pacote (Se Disponível)
+### Option A: Via Package Manager (If Available)
 
 ```bash
 sudo apt install openfpgaloader
 ```
 
-### Opção B: Compilar do Source (Recomendado)
+### Option B: Compile from Source (Recommended)
 
 ```bash
-# Clonar repositório
+# Clone repository
 git clone https://github.com/trabucayre/openFPGALoader.git
 cd openFPGALoader
 
-# Criar diretório de build
+# Create build directory
 mkdir build && cd build
 
-# Configurar CMake
+# Configure CMake
 cmake -DCMAKE_BUILD_TYPE=Release ..
 
-# Compilar (use todos os cores)
+# Compile (use all cores)
 make -j$(nproc)
 
-# Instalar globalmente
+# Install globally
 sudo make install
 
-# Ou instalar localmente
+# Or install locally
 mkdir -p ~/.local/bin
 cp openFPGALoader ~/.local/bin/
 echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
 source ~/.bashrc
 ```
 
-### Verificação
+### Verification
 
 ```bash
 openFPGALoader --version
@@ -219,11 +220,11 @@ openFPGALoader --version
 
 ---
 
-## USB/Driver Configuration
+## USB/Driver Configuration (Linux)
 
 ### 1. Connect Tang Nano
 
-Connect the board via USB-C.
+Connect the board via the USB-C cable.
 
 ### 2. Create udev Rules
 
@@ -289,177 +290,61 @@ openFPGALoader --detect
 
 ---
 
-markdown_content = """# Guia de Instalação do OSS CAD Suite e Configuração do VS Code no Windows
+## Windows Installation
 
-Este guia orienta o processo de instalação do **OSS CAD Suite** (pacote que reúne ferramentas open-source para EDA como Yosys, Verilator, Icarus Verilog e openFPGALoader) e a preparação do **Visual Studio Code** para o desenvolvimento e verificação de hardware, com suporte completo a **SystemVerilog**.
+The OSS CAD Suite is also distributed as a pre-compiled binary for Windows.
 
----
+### Step 1: Download and Run Installer
+1. Access the official GitHub repository: [YosysHQ/oss-cad-suite-build/releases](https://github.com/YosysHQ/oss-cad-suite-build/releases).
+2. In the **Releases** tab, locate the latest version. Windows updates are rolled out slower; currently, the latest Windows update is from 2026-06-03.
+3. In the **Assets** section, download the `.exe` file corresponding to Windows 64-bit (e.g., `oss-cad-suite-windows-x64-YYYYMMDD.exe`).
+4. Run the installer. We recommend extracting it to a directory in the system root to avoid issues with spaces in the path (e.g., `C:\oss-cad-suite`).
+5. Wait for the file extraction to complete.
 
-## 1. Instalação Windows
+### Step 2: PATH Configuration (Environment Variables)
+To use the tools from any terminal or VS Code extension:
+1. Press the Windows key, type **Edit the system environment variables** (or equivalent in your OS language), and press Enter.
+2. Click the **Environment Variables...** button.
+3. In the **System variables** section, locate the **Path** variable and click Edit.
+4. Add the exact path to the `bin` folder of your installation (e.g., `C:\oss-cad-suite\bin`).
+5. Click OK to save all changes.
 
-O OSS CAD Suite é distribuído como um binário pré-compilado para Windows. Siga os passos abaixo para instalar e configurar as variáveis de ambiente:
-
-### Passo 1: Download
-1. Acesse o repositório oficial no GitHub: [YosysHQ/oss-cad-suite-build/releases](https://github.com/YosysHQ/oss-cad-suite-build/releases).
-2. Na aba **Releases**, localize a versão mais recente (A versão para windows parou de ser atualizada recentemente, busque por versões de releases mais antigas).
-3. Na seção **Assets**, baixe o arquivo correspondente ao Windows 64-bit (geralmente nomeado como `oss-cad-suite-windows-x64-YYYYMMDD.exe` ou formato `.zip`).
-
-### Passo 2: Extração
-1. Crie uma pasta diretamente na raiz do seu disco local para evitar problemas com espaços em branco nos caminhos do sistema. 
-   * Exemplo recomendado: `C:\\oss-cad-suite`
-2. Extraia todo o conteúdo do arquivo baixado dentro dessa pasta.
-
-### Passo 3: Configuração do PATH (Variáveis de Ambiente)
-Para utilizar as ferramentas a partir de qualquer terminal ou extensão do VS Code, é necessário adicionar o diretório `bin` ao PATH do Windows:
-1. Pressione a tecla `Windows` no teclado, digite **Editar as variáveis de ambiente do sistema** e pressione `Enter`.
-2. Na janela que se abrir, clique no botão **Variáveis de Ambiente...** (canto inferior direito).
-3. Na seção **Variáveis do sistema**, localize a variável chamada **Path** e dê um duplo clique (ou selecione e clique em *Editar*).
-4. Clique no botão **Novo** do lado direito e adicione o caminho exato para a pasta `bin` da sua instalação.
-   * Exemplo: `C:\\oss-cad-suite\\bin`
-5. Clique em **OK** em todas as janelas para salvar as alterações.
+Open a new terminal and run `yosys --version` and `openFPGALoader --version` to validate the installation.
 
 ---
 
-## 2. Validação da Instalação
+## VS Code Development Extensions
 
-Abra um **novo** terminal (Prompt de Comando ou PowerShell) para carregar as novas variáveis de ambiente e execute os seguintes comandos para garantir que tudo foi instalado com sucesso:
+To streamline development, it is highly recommended to use **Visual Studio Code** with the following extensions:
 
-```bash
-# Verificar Yosys (Síntese)
-yosys --version
+### 1. HDL/Verilog
+Extension for syntax support, formatting, and linting of Verilog and SystemVerilog.
+- **Installation:** Search for `mshr-h.VerilogHDL` in the VS Code extensions tab.
 
-# Verificar Verilator (Linter e Simulação)
-verilator --version
+### 2. Lushay Code
+Extension to automate compilation and programming for Tang Nano boards using the `oss-cad-suite`.
+- **Installation:** Search for `Lushay Code` in the VS Code extensions tab.
 
-# Verificar Icarus Verilog (Simulação)
-iverilog -V
-
-# Verificar openFPGALoader (Gravação em FPGA)
-openFPGALoader --version
-
-```
-## Basic Usage
-
-### Compile Project
-
-```bash
-cd hdl/tang_nano_1k/blink
-
-# Via Makefile (if available)
-make all
-
-# Or manually with yosys
-yosys -m gw1n -d gw1n -p "synth_gowin -json blink.json" blink.v
-
-# Place & Route with nextpnr
-nextpnr-gowin --json blink.json --asc blink.asc --device GW1NZ-1
-
-# Generate bitstream
-gowin_pack -d GW1NZ-1 -o blink.fs blink.asc
-```
-
-### Program FPGA
-
-```bash
-# Detect device
-openFPGALoader --detect
-
-# Program
-openFPGALoader -b tangnano1k blink.fs
-
-# Or with specific bus ID
-openFPGALoader -b tangnano1k -d "0:0000:0000" blink.fs
-```
+**Configuring the Lushay Code Extension:**
+1. In VS Code, open settings (`Ctrl + ,`) and search for `Lushay Code`.
+2. Configure the executable path for the OSS CAD Suite (if necessary, in case the PATH variable does not resolve automatically).
+3. Set your default target board under "FPGA Board" (e.g., `tangnano1k`, `tangnano9k`).
+4. When opening `.v` or `.cst` files, the extension will provide interface buttons ("Build" and "Program") to execute synthesis and programming with a single click. On Windows, it will detect the tools configured in your `Path` variable.
 
 ---
 
-## Troubleshooting
+## Troubleshooting Windows: JTAG and Zadig
 
-### "Command not found: yosys"
+A frequent issue on Windows is a communication failure between `openFPGALoader` and the Tang Nano board due to the generic USB driver installed by the operating system.
 
-**Cause:** oss-cad-suite not in PATH
+**Resolution via Zadig:**
+To allow programming via JTAG, you will need to install the WinUSB driver on the correct interface.
 
-**Solution:**
-```bash
-# 1. Check location
-ls -la /home/tools/oss-cad-suite/bin/yosys
-
-# 2. Check ~/.bashrc
-cat ~/.bashrc | grep "FPGA_TOOLS\|oss-cad-suite"
-
-# 3. Reload
-source ~/.bashrc
-
-# 4. Test again
-yosys --version
-```
-
-### "Device not found" when programming
-
-**Cause:** Tang Nano not detected, missing drivers or insufficient permissions
-
-**Solution:**
-```bash
-# 1. Check USB connection
-lsusb | grep -i ftdi
-
-# 2. Reconnect board
-
-# 3. Reapply udev rules
-sudo udevadm control --reload-rules
-sudo udevadm trigger
-
-# 4. If necessary, use sudo
-sudo openFPGALoader -b tangnano1k blink.fs
-
-# 5. Test again
-openFPGALoader --detect
-```
-
-### USB Permission Problems
-
-```bash
-# Add user to plugdev group
-sudo usermod -a -G plugdev $USER
-
-# Logout and login to apply
-
-# Or run with sudo
-sudo openFPGALoader --detect
-```
-
-### Slow Compilation
-
-The oss-cad-suite can be slow on VMs or older machines. Consider:
-- Using `-j$(nproc)` for parallel builds
-- Running on host machine instead of VM
-
-### openFPGALoader Compilation Errors
-
-```bash
-# Reinstall dependencies
-sudo apt install -y libftdi-dev libftdi1-dev libusb-1.0-0-dev
-
-# Clean previous build
-rm -rf build/
-mkdir build && cd build
-
-# Recompile
-cmake -DCMAKE_BUILD_TYPE=Release ..
-make -j$(nproc)
-sudo make install
-```
-
----
-
-## References
-
-- **oss-cad-suite:** https://github.com/YosysHQ/oss-cad-suite-build
-- **openFPGALoader:** https://github.com/trabucayre/openFPGALoader
-- **Gowin Semiconductor:** https://www.gowinsemi.com/
-- **Yosys:** http://www.clifford.at/yosys/
-- **nextpnr:** https://github.com/YosysHQ/nextpnr
-
----
-
-**Última atualização:** 6 de maio de 2026
+1. Download the [Zadig](https://zadig.akeo.ie/) application and run it as an administrator.
+2. Connect the Tang Nano board to the USB port.
+3. In Zadig, go to the **Options** menu and check **List All Devices**.
+4. In the main dropdown menu, select the JTAG programmer interface.
+   **Critical Warning:** Be extremely careful during this step to select the correct device (usually named `JTAG Debugger (Interface 0)` or similar, with the USB ID `0403 6010`). Changing the driver for other peripherals (like your mouse or keyboard) will cause them to stop working.
+5. In the target driver selection box, choose **WinUSB**.
+6. Click the **Replace Driver** (or **Install Driver**) button.
+7. Wait for the process to finish and test the communication again by running `openFPGALoader --detect` in the terminal.
