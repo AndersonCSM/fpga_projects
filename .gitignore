@@ -1,0 +1,20 @@
+.antigravity/
+
+# Bitstreams and Netlists
+*.json
+*.fs
+*.svf
+*.asc
+
+# Simulation and Logs
+*.log
+*.vcd
+*.gtkw
+
+# Build Directories and IDE Artifacts
+build/
+impl/
+output_files/
+db/
+incremental_db/
+simulation/
