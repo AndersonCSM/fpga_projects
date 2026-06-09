@@ -289,6 +289,55 @@ openFPGALoader --detect
 
 ---
 
+markdown_content = """# Guia de Instalação do OSS CAD Suite e Configuração do VS Code no Windows
+
+Este guia orienta o processo de instalação do **OSS CAD Suite** (pacote que reúne ferramentas open-source para EDA como Yosys, Verilator, Icarus Verilog e openFPGALoader) e a preparação do **Visual Studio Code** para o desenvolvimento e verificação de hardware, com suporte completo a **SystemVerilog**.
+
+---
+
+## 1. Instalação Windows
+
+O OSS CAD Suite é distribuído como um binário pré-compilado para Windows. Siga os passos abaixo para instalar e configurar as variáveis de ambiente:
+
+### Passo 1: Download
+1. Acesse o repositório oficial no GitHub: [YosysHQ/oss-cad-suite-build/releases](https://github.com/YosysHQ/oss-cad-suite-build/releases).
+2. Na aba **Releases**, localize a versão mais recente (A versão para windows parou de ser atualizada recentemente, busque por versões de releases mais antigas).
+3. Na seção **Assets**, baixe o arquivo correspondente ao Windows 64-bit (geralmente nomeado como `oss-cad-suite-windows-x64-YYYYMMDD.exe` ou formato `.zip`).
+
+### Passo 2: Extração
+1. Crie uma pasta diretamente na raiz do seu disco local para evitar problemas com espaços em branco nos caminhos do sistema. 
+   * Exemplo recomendado: `C:\\oss-cad-suite`
+2. Extraia todo o conteúdo do arquivo baixado dentro dessa pasta.
+
+### Passo 3: Configuração do PATH (Variáveis de Ambiente)
+Para utilizar as ferramentas a partir de qualquer terminal ou extensão do VS Code, é necessário adicionar o diretório `bin` ao PATH do Windows:
+1. Pressione a tecla `Windows` no teclado, digite **Editar as variáveis de ambiente do sistema** e pressione `Enter`.
+2. Na janela que se abrir, clique no botão **Variáveis de Ambiente...** (canto inferior direito).
+3. Na seção **Variáveis do sistema**, localize a variável chamada **Path** e dê um duplo clique (ou selecione e clique em *Editar*).
+4. Clique no botão **Novo** do lado direito e adicione o caminho exato para a pasta `bin` da sua instalação.
+   * Exemplo: `C:\\oss-cad-suite\\bin`
+5. Clique em **OK** em todas as janelas para salvar as alterações.
+
+---
+
+## 2. Validação da Instalação
+
+Abra um **novo** terminal (Prompt de Comando ou PowerShell) para carregar as novas variáveis de ambiente e execute os seguintes comandos para garantir que tudo foi instalado com sucesso:
+
+```bash
+# Verificar Yosys (Síntese)
+yosys --version
+
+# Verificar Verilator (Linter e Simulação)
+verilator --version
+
+# Verificar Icarus Verilog (Simulação)
+iverilog -V
+
+# Verificar openFPGALoader (Gravação em FPGA)
+openFPGALoader --version
+
+```
 ## Basic Usage
 
 ### Compile Project
