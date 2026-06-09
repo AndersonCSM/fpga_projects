@@ -42,5 +42,4 @@ Once installed, follow these guides to run your first project:
 
 ### Hardware
 - [Tang Nano 1K/20K](https://sipeed.com/tang-nano-1k)
-- [Gowin FPGA](https://www.gowinsemi.com/)
 - [Altera MAX II](https://www.intel.com/content/www/us/en/products/details/fpga/max/ii.html)
